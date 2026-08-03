@@ -1273,34 +1273,36 @@
             }
 
             // ============================================================
-            // API
-            // ============================================================
-            const API_BASE = 'https://api-football-v1.p.rapidapi.com/v3';
-
-            function testApiKey() {
-                const key = document.getElementById('apiKeyInput').value.trim();
-                if (!key) {
-                    document.getElementById('apiStatus').textContent = '❌ Введите ключ';
-                    return;
-                }
-                document.getElementById('apiStatus').textContent = '⏳ Проверка...';
-                fetch(`${API_BASE}/status`, {
-                    headers: {
-                        'x-rapidapi-key': key,
-                        'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
-                    }
-                }).then(function(response) {
-                    if (response.ok) {
-                        document.getElementById('apiStatus').textContent = '✅ Ключ работает!';
-                        appData.apiKey = key;
-                        saveData();
-                    } else {
-                        document.getElementById('apiStatus').textContent = '❌ Ключ не работает (' + response.status + ')';
-                    }
-                }).catch(function() {
-                    document.getElementById('apiStatus').textContent = '❌ Ошибка соединения';
-                });
-            }
+// API ТЕСТ (ИСПРАВЛЕННЫЙ)
+// ============================================================
+function testApiKey() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (!key) {
+        document.getElementById('apiStatus').textContent = '❌ Введите ключ';
+        return;
+    }
+    document.getElementById('apiStatus').textContent = '⏳ Проверка...';
+    
+    // Используем реальный запрос к командам (доступен во всех тарифах)
+    fetch('https://api-football-v1.p.rapidapi.com/v3/teams?search=Real', {
+        headers: {
+            'x-rapidapi-key': key,
+            'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
+        }
+    })
+    .then(function(response) {
+        if (response.ok) {
+            document.getElementById('apiStatus').textContent = '✅ Ключ работает!';
+            appData.apiKey = key;
+            saveData();
+        } else {
+            document.getElementById('apiStatus').textContent = '❌ Ключ не работает (' + response.status + ')';
+        }
+    })
+    .catch(function() {
+        document.getElementById('apiStatus').textContent = '❌ Ошибка соединения';
+    });
+}
 
             // ============================================================
             // ЭКСПОРТ / ИМПОРТ
