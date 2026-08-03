@@ -233,3 +233,543 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Квантум PRO v4.2 — Слой 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #0B0E17;
+            color: #E0E0E0;
+            padding-bottom: 70px;
+        }
+        .header {
+            background: #0B0E17;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1F2633;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header h1 span {
+            background: #00E676;
+            color: #0B0E17;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+        .header .live {
+            color: #00E676;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header .live::before {
+            content: "●";
+            animation: pulse-dot 1.5s infinite;
+        }
+        @keyframes pulse-dot {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+            animation: fadeSlide 0.25s ease;
+        }
+        @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background: #141A26;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #1F2633;
+        }
+        .card .vs {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .card .vs small {
+            display: block;
+            font-size: 13px;
+            color: #9E9E9E;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+        .card .meta {
+            text-align: center;
+            font-size: 13px;
+            color: #9E9E9E;
+            margin: 8px 0 16px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .card .meta span {
+            background: #1F2633;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+        .indicator {
+            margin-bottom: 12px;
+        }
+        .indicator .label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .indicator .label .value {
+            color: #00E676;
+            font-weight: 700;
+        }
+        .indicator .bar {
+            height: 8px;
+            background: #1F2633;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .indicator .bar .fill {
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #00E676, #00C853);
+            transition: width 0.6s ease;
+            width: 0%;
+        }
+        .recommendation {
+            background: #00E676;
+            color: #0B0E17;
+            font-weight: 700;
+            font-size: 18px;
+            padding: 6px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            margin: 6px 0 12px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 12px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #1F2633;
+            color: #E0E0E0;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: #00E676;
+            color: #0B0E17;
+        }
+        .btn-primary:active {
+            background: #00C853;
+        }
+        .btn-secondary {
+            background: #1F2633;
+            color: #E0E0E0;
+        }
+        .btn-secondary:active {
+            background: #2A3342;
+        }
+        .quick-input {
+            background: #141A26;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        .quick-input .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .quick-input .row input {
+            background: #0B0E17;
+            border: 1px solid #1F2633;
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #E0E0E0;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+        .quick-input .row input::placeholder {
+            color: #5A667A;
+        }
+        .quick-input .full-width {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0B0E17;
+            border: 1px solid #1F2633;
+            border-radius: 12px;
+            color: #E0E0E0;
+            font-size: 14px;
+            margin-bottom: 10px;
+            outline: none;
+        }
+        .quick-input .full-width::placeholder {
+            color: #5A667A;
+        }
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #0B0E17;
+            border-top: 1px solid #1F2633;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 12px;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 11px;
+            color: #9E9E9E;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px 12px;
+            font-family: inherit;
+            transition: 0.15s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .nav-item .icon {
+            font-size: 24px;
+            line-height: 1.2;
+        }
+        .nav-item.active {
+            color: #00E676;
+        }
+        .nav-item.active .icon {
+            transform: scale(1.05);
+        }
+        .nav-item:active {
+            transform: scale(0.92);
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🔥 КВАНТУМ PRO <span>v4.2</span></h1>
+        <div class="live">LIVE</div>
+    </div>
+
+    <div class="container" id="appContainer">
+
+        <!-- ===== ГЛАВНАЯ ===== -->
+        <div class="screen active" id="screen-home">
+            <!-- Карточка матча -->
+            <div class="card" id="matchCard">
+                <div class="vs">
+                    ⚔️ <span id="teamHome">—</span> — <span id="teamAway">—</span>
+                    <small id="tournament">Нет данных</small>
+                </div>
+                <div class="meta">
+                    <span>🏆 <span id="leagueDisplay">—</span></span>
+                    <span>📅 <span id="dateDisplay">—</span></span>
+                    <span>⏰ <span id="timeDisplay">—</span></span>
+                </div>
+                <div class="indicator">
+                    <div class="label"><span>📊 Индекс доверия</span><span class="value" id="trustValue">—%</span></div>
+                    <div class="bar"><div class="fill" id="trustFill" style="width:0%"></div></div>
+                </div>
+                <div class="indicator">
+                    <div class="label"><span>🎯 Вероятность ОЗ</span><span class="value" id="ozValue">—%</span></div>
+                    <div class="bar"><div class="fill" id="ozFill" style="width:0%"></div></div>
+                </div>
+                <div class="recommendation" id="recommendationBadge">⚪ НЕТ ДАННЫХ</div>
+                <div style="margin:10px 0 6px; display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; font-size:15px;">
+                    <span>💰 КЭФ В БК: <strong id="oddsDisplay">—</strong></span>
+                    <span>📈 Валуй: <strong id="valueDisplay" style="color:#9E9E9E;">—</strong></span>
+                    <span>💡 Ставка: <strong id="betSizeDisplay">—</strong></span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="saveBtn">🟢 СОХРАНИТЬ ПРОГНОЗ</button>
+                    <button class="btn btn-secondary" id="bookmakerBtn">🔗 ПЕРЕЙТИ В БК</button>
+                </div>
+            </div>
+
+            <!-- Быстрый ввод -->
+            <div class="quick-input">
+                <div style="font-size:14px; font-weight:600; margin-bottom:8px;">⚡ Быстрый ввод матча</div>
+                <div class="row">
+                    <input type="text" id="inputHome" placeholder="Хозяева" autocomplete="off">
+                    <input type="text" id="inputAway" placeholder="Гости" autocomplete="off">
+                </div>
+                <div class="row">
+                    <input type="text" id="inputLeague" placeholder="Лига (авто)">
+                    <input type="text" id="inputCountry" placeholder="Страна (авто)">
+                </div>
+                <div class="row">
+                    <input type="number" id="inputXg" placeholder="xG хозяев" step="0.01">
+                    <input type="number" id="inputXga" placeholder="xG гостей" step="0.01">
+                </div>
+                <div class="row">
+                    <input type="number" id="inputOz" placeholder="ОЗ % (91)" step="0.1">
+                    <input type="number" id="inputOdds" placeholder="Кэф (2.10)" step="0.01">
+                </div>
+                <input type="text" class="full-width" id="inputComment" placeholder="📝 Комментарий">
+                <button class="btn btn-primary" style="width:100%;" id="quickAddBtn">➕ Добавить матч</button>
+                <button class="btn btn-secondary" style="width:100%; margin-top:8px;" id="clearFieldsBtn">🧹 Очистить поля</button>
+            </div>
+        </div>
+
+        <!-- ===== ИСТОРИЯ ===== -->
+        <div class="screen" id="screen-history">
+            <div class="card">
+                <h2>📋 История</h2>
+                <p style="color:#9E9E9E;">Здесь будет список матчей</p>
+            </div>
+        </div>
+
+        <!-- ===== ОБУЧЕНИЕ ===== -->
+        <div class="screen" id="screen-training">
+            <div class="card">
+                <h2>🧠 Обучение</h2>
+                <p style="color:#9E9E9E;">Здесь будет обучение AI</p>
+            </div>
+        </div>
+
+        <!-- ===== НАСТРОЙКИ ===== -->
+        <div class="screen" id="screen-settings">
+            <div class="card">
+                <h2>⚙️ Настройки</h2>
+                <p style="color:#9E9E9E;">Здесь будут настройки</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== НАВИГАЦИЯ ===== -->
+    <div class="nav-bar" id="navBar">
+        <button class="nav-item active" data-tab="screen-home">
+            <span class="icon">🏠</span>Главная
+        </button>
+        <button class="nav-item" data-tab="screen-history">
+            <span class="icon">📋</span>История
+        </button>
+        <button class="nav-item" data-tab="screen-training">
+            <span class="icon">🧠</span>Обучение
+        </button>
+        <button class="nav-item" data-tab="screen-settings">
+            <span class="icon">⚙️</span>Настройки
+        </button>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            console.log('✅ Слой 2 — карточка матча загружена');
+
+            // ============================================================
+            // НАСТРОЙКИ (временные, для расчётов)
+            // ============================================================
+            const settings = {
+                trust: 38,
+                bank: 10000,
+                kellyPercent: 20
+            };
+
+            // ============================================================
+            // НАВИГАЦИЯ
+            // ============================================================
+            const navItems = document.querySelectorAll('.nav-item');
+            const screens = {
+                'screen-home': document.getElementById('screen-home'),
+                'screen-history': document.getElementById('screen-history'),
+                'screen-training': document.getElementById('screen-training'),
+                'screen-settings': document.getElementById('screen-settings')
+            };
+
+            navItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    const target = this.dataset.tab;
+                    navItems.forEach(function(i) { i.classList.remove('active'); });
+                    this.classList.add('active');
+                    Object.keys(screens).forEach(function(key) {
+                        screens[key].classList.remove('active');
+                    });
+                    if (screens[target]) screens[target].classList.add('active');
+                    console.log('🔀 Переключено на:', target);
+                });
+            });
+
+            // ============================================================
+            // КАРТОЧКА МАТЧА
+            // ============================================================
+            function updateMainCard() {
+                const home = document.getElementById('inputHome').value || '—';
+                const away = document.getElementById('inputAway').value || '—';
+                const oz = parseFloat(document.getElementById('inputOz').value) || 0;
+                const odds = parseFloat(document.getElementById('inputOdds').value) || 0;
+                const trust = settings.trust || 38;
+
+                document.getElementById('teamHome').textContent = home;
+                document.getElementById('teamAway').textContent = away;
+                document.getElementById('ozValue').textContent = oz > 0 ? oz + '%' : '—%';
+                document.getElementById('ozFill').style.width = Math.min(oz, 100) + '%';
+                document.getElementById('oddsDisplay').textContent = odds > 0 ? odds.toFixed(2) : '—';
+                document.getElementById('trustValue').textContent = trust + '%';
+                document.getElementById('trustFill').style.width = Math.min(trust, 100) + '%';
+
+                // Рекомендация
+                const badge = document.getElementById('recommendationBadge');
+                if (oz >= 86) {
+                    badge.textContent = '🟢 ОЗ – ДА';
+                } else if (oz > 0) {
+                    badge.textContent = '🔴 ОЗ – НЕТ';
+                } else {
+                    badge.textContent = '⚪ НЕТ ДАННЫХ';
+                }
+
+                // Валуй
+                const valueEl = document.getElementById('valueDisplay');
+                if (oz > 0 && odds > 0) {
+                    const value = (oz / 100) * odds - 1;
+                    if (value > 0.05) {
+                        valueEl.textContent = 'ДА (+' + value.toFixed(2) + ')';
+                        valueEl.style.color = '#00E676';
+                    } else if (value > -0.05) {
+                        valueEl.textContent = 'Нейтрально (' + value.toFixed(2) + ')';
+                        valueEl.style.color = '#FFD740';
+                    } else {
+                        valueEl.textContent = 'НЕТ (' + value.toFixed(2) + ')';
+                        valueEl.style.color = '#FF5253';
+                    }
+                } else {
+                    valueEl.textContent = '—';
+                    valueEl.style.color = '#9E9E9E';
+                }
+
+                // Келли
+                const bank = settings.bank || 10000;
+                const kellyPct = settings.kellyPercent || 20;
+                document.getElementById('betSizeDisplay').textContent = (oz > 0 && odds > 0) ?
+                    kellyPct + '% (' + Math.round(bank * kellyPct / 100) + ' ₽)' :
+                    '—';
+
+                // Дата и время
+                const now = new Date();
+                document.getElementById('dateDisplay').textContent = now.toLocaleDateString();
+                document.getElementById('timeDisplay').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('leagueDisplay').textContent = document.getElementById('inputLeague').value || '—';
+            }
+
+            // ============================================================
+            // ОЧИСТКА ПОЛЕЙ
+            // ============================================================
+            function clearFields() {
+                document.getElementById('inputHome').value = '';
+                document.getElementById('inputAway').value = '';
+                document.getElementById('inputLeague').value = '';
+                document.getElementById('inputCountry').value = '';
+                document.getElementById('inputXg').value = '';
+                document.getElementById('inputXga').value = '';
+                document.getElementById('inputOz').value = '';
+                document.getElementById('inputOdds').value = '';
+                document.getElementById('inputComment').value = '';
+                updateMainCard();
+                console.log('🧹 Поля очищены');
+            }
+
+            // ============================================================
+            // СОХРАНЕНИЕ МАТЧА (заглушка)
+            // ============================================================
+            function saveMatch() {
+                const home = document.getElementById('inputHome').value.trim() || '—';
+                const away = document.getElementById('inputAway').value.trim() || '—';
+                const oz = parseFloat(document.getElementById('inputOz').value) || 0;
+                const odds = parseFloat(document.getElementById('inputOdds').value) || 0;
+
+                if (home === '—' || away === '—' || oz === 0 || odds === 0) {
+                    alert('⚠️ Заполните все обязательные поля (Хозяева, Гости, ОЗ, Кэф)');
+                    return;
+                }
+
+                alert('✅ Матч сохранён (заглушка). В Слое 3 появится история.');
+                clearFields();
+            }
+
+            // ============================================================
+            // СОБЫТИЯ
+            // ============================================================
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🔄 DOM загружен');
+
+                // Привязываем обновление карточки к вводу
+                const inputs = ['inputHome', 'inputAway', 'inputLeague', 'inputCountry', 'inputXg', 'inputXga', 'inputOz', 'inputOdds', 'inputComment'];
+                inputs.forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener('input', updateMainCard);
+                });
+
+                // Кнопки
+                document.getElementById('clearFieldsBtn').addEventListener('click', clearFields);
+                document.getElementById('saveBtn').addEventListener('click', saveMatch);
+                document.getElementById('quickAddBtn').addEventListener('click', saveMatch);
+                document.getElementById('bookmakerBtn').addEventListener('click', function() {
+                    alert('🔗 Переход в БК (заглушка)');
+                });
+
+                // Первоначальное обновление
+                updateMainCard();
+                console.log('✅ Слой 2 загружен и готов');
+            });
+        })();
+    </script>
+</body>
+</html>
