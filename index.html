@@ -879,7 +879,7 @@
         (function() {
             'use strict';
 
-            console.log('✅ v5.0 — Слой 1 (PWA + автопоиск)');
+            console.log('✅ v5.0 — Слой 2 (авто-подгрузка xG, кэфа, лиги, страны)');
 
             // ============================================================
             // ДАННЫЕ
@@ -1057,6 +1057,125 @@
             }
 
             // ============================================================
+            // ПОЛУЧЕНИЕ ДАННЫХ МАТЧА (xG, кэф, лига, страна)
+            // ============================================================
+            async function getMatchData(teamName) {
+                const key = getApiKey();
+                if (!key) return null;
+                try {
+                    // Ищем команду
+                    const teamResponse = await fetch(API_BASE + '/teams?search=' + encodeURIComponent(teamName), {
+                        headers: {
+                            'x-rapidapi-key': key,
+                            'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
+                        }
+                    });
+                    if (!teamResponse.ok) return null;
+                    const teamData = await teamResponse.json();
+                    if (!teamData.response || teamData.response.length === 0) return null;
+
+                    const teamId = teamData.response[0].team.id;
+                    const country = teamData.response[0].team.country || 'Неизвестно';
+                    const league = teamData.response[0].team.league || 'Неизвестно';
+
+                    // Ищем последний матч команды для xG
+                    const fixtureResponse = await fetch(API_BASE + '/fixtures?team=' + teamId + '&last=1', {
+                        headers: {
+                            'x-rapidapi-key': key,
+                            'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
+                        }
+                    });
+                    if (!fixtureResponse.ok) return { country, league, xg: 0, xga: 0, odds: 0 };
+
+                    const fixtureData = await fixtureResponse.json();
+                    if (!fixtureData.response || fixtureData.response.length === 0) {
+                        return { country, league, xg: 0, xga: 0, odds: 0 };
+                    }
+
+                    const fixture = fixtureData.response[0];
+                    const fixtureId = fixture.fixture.id;
+
+                    // Получаем статистику матча (xG)
+                    let xgHome = 0,
+                        xgAway = 0;
+                    try {
+                        const statsResponse = await fetch(API_BASE + '/fixtures/statistics?fixture=' + fixtureId, {
+                            headers: {
+                                'x-rapidapi-key': key,
+                                'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
+                            }
+                        });
+                        if (statsResponse.ok) {
+                            const statsData = await statsResponse.json();
+                            if (statsData.response && statsData.response.length > 0) {
+                                // Ищем xG для хозяев и гостей
+                                statsData.response.forEach(function(stat) {
+                                    if (stat.team && stat.team.name === fixture.teams.home.name) {
+                                        stat.statistics.forEach(function(s) {
+                                            if (s.type === 'Expected Goals') {
+                                                xgHome = parseFloat(s.value) || 0;
+                                            }
+                                        });
+                                    }
+                                    if (stat.team && stat.team.name === fixture.teams.away.name) {
+                                        stat.statistics.forEach(function(s) {
+                                            if (s.type === 'Expected Goals') {
+                                                xgAway = parseFloat(s.value) || 0;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Ошибка получения xG:', e);
+                    }
+
+                    // Получаем коэффициенты (Odds)
+                    let odds = 0;
+                    try {
+                        const oddsResponse = await fetch(API_BASE + '/odds?fixture=' + fixtureId, {
+                            headers: {
+                                'x-rapidapi-key': key,
+                                'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
+                            }
+                        });
+                        if (oddsResponse.ok) {
+                            const oddsData = await oddsResponse.json();
+                            if (oddsData.response && oddsData.response.length > 0) {
+                                // Ищем коэффициент на "Обе забьют"
+                                for (let bookmaker of oddsData.response) {
+                                    for (let bet of bookmaker.bets) {
+                                        if (bet.name === 'Both Teams Score') {
+                                            const yes = bet.values.find(function(v) { return v.value === 'Yes'; });
+                                            if (yes) {
+                                                odds = parseFloat(yes.odd) || 0;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (odds > 0) break;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Ошибка получения коэффициентов:', e);
+                    }
+
+                    return {
+                        country: country,
+                        league: league,
+                        xg: xgHome,
+                        xga: xgAway,
+                        odds: odds
+                    };
+                } catch (e) {
+                    console.warn('Ошибка получения данных матча:', e);
+                    return null;
+                }
+            }
+
+            // ============================================================
             // УМНЫЙ ПОИСК КОМАНД
             // ============================================================
             function setupTeamSearch() {
@@ -1085,7 +1204,7 @@
                                 container.innerHTML = results.map(function(r) {
                                     return '<div class="item" data-name="' + r.name +
                                         '" data-country="' + r.country +
-                                        '" data-league="' + r.league + '">' +
+                                        '" data-league="' + r.league + '" data-id="' + r.id + '">' +
                                         '<span>' + r.name + '</span>' +
                                         '<span style="color:#9E9E9E; font-size:12px;">' +
                                         r.country + ' · ' + r.league +
@@ -1101,7 +1220,29 @@
                                         document.getElementById('inputLeague').value = league;
                                         document.getElementById('inputCountry').value = country;
                                         container.style.display = 'none';
-                                        updateMainCard();
+
+                                        // Загружаем данные через API
+                                        getMatchData(name).then(function(data) {
+                                            if (data) {
+                                                if (data.xg > 0) document.getElementById(
+                                                    'inputXg').value = data.xg;
+                                                if (data.xga > 0) document.getElementById(
+                                                    'inputXga').value = data.xga;
+                                                if (data.odds > 0) document.getElementById(
+                                                    'inputOdds').value = data.odds;
+                                                if (data.league && document.getElementById(
+                                                        'inputLeague').value === '') {
+                                                    document.getElementById('inputLeague')
+                                                        .value = data.league;
+                                                }
+                                                if (data.country && document.getElementById(
+                                                        'inputCountry').value === '') {
+                                                    document.getElementById('inputCountry')
+                                                        .value = data.country;
+                                                }
+                                                updateMainCard();
+                                            }
+                                        });
                                     });
                                 });
                             });
@@ -1761,7 +1902,7 @@
                 }
                 renderHistory();
                 updateMainCard();
-                console.log('✅ v5.0 Слой 1 загружен, матчей:', appData.matches.length);
+                console.log('✅ v5.0 Слой 2 загружен, матчей:', appData.matches.length);
             });
         })();
     </script>
