@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Квантум PRO v4.2 — Слой 4</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0B0E17">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogItCa0LLQsNC90YLRg9C8IFBSTyB2NS4wIiwKICAic2hvcnRfbmFtZSI6ICLQmtCy0LDQvdGC0YPQvSBQUk8iLAogICJkZXNjcmlwdGlvbiI6ICLQo9C80L3Ri9C5INCw0L3QsNC70LjRgtC40YfQtdGB0LrQuNC5INGG0LXQvdGC0YAg0LTQu9GPINGB0YLQsNCy0L7QuiIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMEIwRTE3IiwKICAidGhlbWVfY29sb3IiOiAiIzAwRTY3NiIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCw8c3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnPjxjaXJjbGUgY3g9JzUwJyBjeT0nNTAnIHI9JzUwJyBmaWxsPSclMjMwMEU2NzYnLz48dGV4dCB4PSc1MCcgeT0nNjUnIGZvbnQtc2l6ZT0nNDAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyUyMzBCMEUxNycgZm9udC1mYW1pbHk9J3NhbnMtc2VyaWYnPuKArTwvdGV4dD48L3N2Zz4iLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLAogICAgICAicHVycG9zZSI6ICJhbnkgbWFzayBhbnlsYW5nIgogICAgfQogIF0KfQ==">
+    <title>Квантум PRO v5.0</title>
     <style>
+        /* ===== RESET & GLOBAL ===== */
         * {
             margin: 0;
             padding: 0;
@@ -614,12 +619,49 @@
             0% { opacity: 1; transform: translateY(0) scale(1); }
             100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
         }
+        .suggestions {
+            background: #1F2633;
+            border-radius: 12px;
+            margin-top: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+        body.light .suggestions {
+            background: #FFFFFF;
+            border: 1px solid #E5E5EA;
+        }
+        .suggestions .item {
+            padding: 10px 14px;
+            border-bottom: 1px solid #2A3342;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        body.light .suggestions .item {
+            border-bottom-color: #E5E5EA;
+        }
+        .suggestions .item:hover {
+            background: #2A3342;
+        }
+        body.light .suggestions .item:hover {
+            background: #F2F2F7;
+        }
+        .suggestions .item .flag {
+            font-size: 18px;
+        }
+        .suggestions .item .league-name {
+            color: #9E9E9E;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>🔥 КВАНТУМ PRO <span>v4.2</span></h1>
+        <h1>🔥 КВАНТУМ PRO <span>v5.0</span></h1>
         <div class="live">LIVE</div>
     </div>
 
@@ -663,6 +705,8 @@
                     <input type="text" id="inputHome" placeholder="Хозяева" autocomplete="off">
                     <input type="text" id="inputAway" placeholder="Гости" autocomplete="off">
                 </div>
+                <div id="homeSuggestions" class="suggestions"></div>
+                <div id="awaySuggestions" class="suggestions"></div>
                 <div class="row">
                     <input type="text" id="inputLeague" placeholder="Лига (авто)">
                     <input type="text" id="inputCountry" placeholder="Страна (авто)">
@@ -835,13 +879,14 @@
         (function() {
             'use strict';
 
-            console.log('✅ Слой 4 — полные настройки (без теста API)');
+            console.log('✅ v5.0 — Слой 1 (PWA + автопоиск)');
 
             // ============================================================
             // ДАННЫЕ
             // ============================================================
             let appData = loadData();
             let currentFilter = 'all';
+            let apiKey = '';
 
             function loadData() {
                 try {
@@ -946,7 +991,8 @@
                 setToggle('toggleReminder', s.reminder);
                 setToggle('toggleTheme', s.theme === 'light');
                 if (appData.apiKey) {
-                    document.getElementById('apiKeyInput').value = appData.apiKey;
+                    apiKey = appData.apiKey;
+                    document.getElementById('apiKeyInput').value = apiKey;
                     document.getElementById('apiStatus').textContent = '✅ Ключ загружен';
                 }
             }
@@ -961,6 +1007,179 @@
             function getToggle(id) {
                 const el = document.getElementById(id);
                 return el ? el.classList.contains('active') : false;
+            }
+
+            // ============================================================
+            // API-FOOTBALL
+            // ============================================================
+            const API_BASE = 'https://api-football-v1.p.rapidapi.com/v3';
+
+            function getApiKey() {
+                if (!apiKey) {
+                    const input = document.getElementById('apiKeyInput').value.trim();
+                    if (input) {
+                        apiKey = input;
+                        appData.apiKey = apiKey;
+                        saveData();
+                        document.getElementById('apiStatus').textContent = '✅ Ключ сохранён';
+                    }
+                }
+                return apiKey;
+            }
+
+            async function searchTeamsApi(query) {
+                const key = getApiKey();
+                if (!key) return [];
+                try {
+                    const response = await fetch(API_BASE + '/teams?search=' + encodeURIComponent(query), {
+                        headers: {
+                            'x-rapidapi-key': key,
+                            'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
+                        }
+                    });
+                    if (!response.ok) return [];
+                    const data = await response.json();
+                    if (data.response && data.response.length > 0) {
+                        return data.response.map(function(item) {
+                            return {
+                                id: item.team.id,
+                                name: item.team.name,
+                                country: item.team.country || 'Неизвестно',
+                                league: item.team.league || 'Неизвестно'
+                            };
+                        });
+                    }
+                    return [];
+                } catch (e) {
+                    console.warn('Ошибка поиска:', e);
+                    return [];
+                }
+            }
+
+            // ============================================================
+            // УМНЫЙ ПОИСК КОМАНД
+            // ============================================================
+            function setupTeamSearch() {
+                const homeInput = document.getElementById('inputHome');
+                const awayInput = document.getElementById('inputAway');
+                const homeContainer = document.getElementById('homeSuggestions');
+                const awayContainer = document.getElementById('awaySuggestions');
+
+                function setupField(input, container) {
+                    let currentQuery = '';
+                    input.addEventListener('input', function() {
+                        const query = this.value.trim();
+                        currentQuery = query;
+                        if (query.length < 2) {
+                            container.style.display = 'none';
+                            return;
+                        }
+                        const key = getApiKey();
+                        if (key) {
+                            searchTeamsApi(query).then(function(results) {
+                                if (currentQuery !== query) return;
+                                if (results.length === 0) {
+                                    container.style.display = 'none';
+                                    return;
+                                }
+                                container.innerHTML = results.map(function(r) {
+                                    return '<div class="item" data-name="' + r.name +
+                                        '" data-country="' + r.country +
+                                        '" data-league="' + r.league + '">' +
+                                        '<span>' + r.name + '</span>' +
+                                        '<span style="color:#9E9E9E; font-size:12px;">' +
+                                        r.country + ' · ' + r.league +
+                                        '</span></div>';
+                                }).join('');
+                                container.style.display = 'block';
+                                container.querySelectorAll('.item').forEach(function(el) {
+                                    el.addEventListener('click', function() {
+                                        var name = this.dataset.name;
+                                        var country = this.dataset.country;
+                                        var league = this.dataset.league;
+                                        document.getElementById(input.id).value = name;
+                                        document.getElementById('inputLeague').value = league;
+                                        document.getElementById('inputCountry').value = country;
+                                        container.style.display = 'none';
+                                        updateMainCard();
+                                    });
+                                });
+                            });
+                        } else {
+                            // Если ключа нет — локальный поиск
+                            var results = searchTeamsLocal(query);
+                            if (results.length === 0) {
+                                container.style.display = 'none';
+                                return;
+                            }
+                            container.innerHTML = results.map(function(r) {
+                                return '<div class="item" data-name="' + r.name +
+                                    '" data-country="' + r.country +
+                                    '" data-league="' + r.league + '">' +
+                                    '<span>' + r.name + '</span>' +
+                                    '<span style="color:#9E9E9E; font-size:12px;">' +
+                                    r.country + ' · ' + r.league +
+                                    '</span></div>';
+                            }).join('');
+                            container.style.display = 'block';
+                            container.querySelectorAll('.item').forEach(function(el) {
+                                el.addEventListener('click', function() {
+                                    var name = this.dataset.name;
+                                    var country = this.dataset.country;
+                                    var league = this.dataset.league;
+                                    document.getElementById(input.id).value = name;
+                                    document.getElementById('inputLeague').value = league;
+                                    document.getElementById('inputCountry').value = country;
+                                    container.style.display = 'none';
+                                    updateMainCard();
+                                });
+                            });
+                        }
+                    });
+                    document.addEventListener('click', function(e) {
+                        if (!container.contains(e.target) && e.target !== input) {
+                            container.style.display = 'none';
+                        }
+                    });
+                }
+
+                function searchTeamsLocal(query) {
+                    var mockTeams = [
+                        { name: 'Реал Мадрид', country: 'Испания', league: 'Ла Лига' },
+                        { name: 'Барселона', country: 'Испания', league: 'Ла Лига' },
+                        { name: 'Атлетико Мадрид', country: 'Испания', league: 'Ла Лига' },
+                        { name: 'Манчестер Сити', country: 'Англия', league: 'АПЛ' },
+                        { name: 'Ливерпуль', country: 'Англия', league: 'АПЛ' },
+                        { name: 'Арсенал', country: 'Англия', league: 'АПЛ' },
+                        { name: 'Челси', country: 'Англия', league: 'АПЛ' },
+                        { name: 'Тоттенхэм', country: 'Англия', league: 'АПЛ' },
+                        { name: 'Бавария', country: 'Германия', league: 'Бундеслига' },
+                        { name: 'Боруссия Дортмунд', country: 'Германия', league: 'Бундеслига' },
+                        { name: 'Ювентус', country: 'Италия', league: 'Серия А' },
+                        { name: 'Милан', country: 'Италия', league: 'Серия А' },
+                        { name: 'Интер', country: 'Италия', league: 'Серия А' },
+                        { name: 'Наполи', country: 'Италия', league: 'Серия А' },
+                        { name: 'ПСЖ', country: 'Франция', league: 'Лига 1' },
+                        { name: 'Марсель', country: 'Франция', league: 'Лига 1' },
+                        { name: 'Зенит', country: 'Россия', league: 'РПЛ' },
+                        { name: 'ЦСКА', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Спартак', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Динамо Москва', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Локомотив', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Краснодар', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Ростов', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Уфа', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Камаз', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Велес', country: 'Россия', league: 'РПЛ' },
+                        { name: 'Ротор', country: 'Россия', league: 'РПЛ' }
+                    ];
+                    return mockTeams.filter(function(t) {
+                        return t.name.toLowerCase().includes(query.toLowerCase());
+                    });
+                }
+
+                setupField(homeInput, homeContainer);
+                setupField(awayInput, awayContainer);
             }
 
             // ============================================================
@@ -993,7 +1212,7 @@
 
                 const valueEl = document.getElementById('valueDisplay');
                 if (oz > 0 && odds > 0) {
-                    const value = (oz / 100) * odds - 1;
+                    var value = (oz / 100) * odds - 1;
                     if (value > 0.05) {
                         valueEl.textContent = 'ДА (+' + value.toFixed(2) + ')';
                         valueEl.style.color = '#00E676';
@@ -1009,15 +1228,16 @@
                     valueEl.style.color = '#9E9E9E';
                 }
 
-                const bank = settings.bank || 10000;
-                const kellyPct = settings.kellyPercent || 20;
+                var bank = settings.bank || 10000;
+                var kellyPct = settings.kellyPercent || 20;
                 document.getElementById('betSizeDisplay').textContent = (oz > 0 && odds > 0) ?
                     kellyPct + '% (' + Math.round(bank * kellyPct / 100) + ' ₽)' :
                     '—';
 
-                const now = new Date();
+                var now = new Date();
                 document.getElementById('dateDisplay').textContent = now.toLocaleDateString();
-                document.getElementById('timeDisplay').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('timeDisplay').textContent = now.toLocaleTimeString([], { hour: '2-digit',
+                    minute: '2-digit' });
                 document.getElementById('leagueDisplay').textContent = document.getElementById('inputLeague').value || '—';
             }
 
@@ -1042,23 +1262,23 @@
             // СОХРАНЕНИЕ МАТЧА
             // ============================================================
             function saveMatch() {
-                const home = document.getElementById('inputHome').value.trim() || '—';
-                const away = document.getElementById('inputAway').value.trim() || '—';
-                const league = document.getElementById('inputLeague').value.trim() || 'Не указана';
-                const country = document.getElementById('inputCountry').value.trim() || 'Не указана';
-                const oz = parseFloat(document.getElementById('inputOz').value) || 0;
-                const odds = parseFloat(document.getElementById('inputOdds').value) || 0;
-                const xg = parseFloat(document.getElementById('inputXg').value) || 0;
-                const xga = parseFloat(document.getElementById('inputXga').value) || 0;
-                const comment = document.getElementById('inputComment').value.trim() || '';
-                const settings = getSettings();
+                var home = document.getElementById('inputHome').value.trim() || '—';
+                var away = document.getElementById('inputAway').value.trim() || '—';
+                var league = document.getElementById('inputLeague').value.trim() || 'Не указана';
+                var country = document.getElementById('inputCountry').value.trim() || 'Не указана';
+                var oz = parseFloat(document.getElementById('inputOz').value) || 0;
+                var odds = parseFloat(document.getElementById('inputOdds').value) || 0;
+                var xg = parseFloat(document.getElementById('inputXg').value) || 0;
+                var xga = parseFloat(document.getElementById('inputXga').value) || 0;
+                var comment = document.getElementById('inputComment').value.trim() || '';
+                var settings = getSettings();
 
                 if (home === '—' || away === '—' || oz === 0 || odds === 0) {
                     alert('⚠️ Заполните все обязательные поля (Хозяева, Гости, ОЗ, Кэф)');
                     return;
                 }
 
-                const match = {
+                var match = {
                     id: Date.now(),
                     home: home,
                     away: away,
@@ -1079,7 +1299,7 @@
                 appData.matches.unshift(match);
                 saveData();
 
-                const card = document.getElementById('matchCard');
+                var card = document.getElementById('matchCard');
                 card.classList.add('fly-away');
                 setTimeout(function() {
                     card.classList.remove('fly-away');
@@ -1097,8 +1317,8 @@
             // ============================================================
             function renderHistory(filter) {
                 currentFilter = filter || currentFilter;
-                const list = document.getElementById('historyList');
-                let matches = appData.matches || [];
+                var list = document.getElementById('historyList');
+                var matches = appData.matches || [];
 
                 if (currentFilter === 'waiting') {
                     matches = matches.filter(function(m) { return m.status === 'waiting'; });
@@ -1112,49 +1332,52 @@
                     list.innerHTML = '<div style="text-align:center; color:#9E9E9E; padding:30px 0;">Нет матчей</div>';
                 } else {
                     list.innerHTML = matches.map(function(m) {
-                        let statusIcon = '⏳',
+                        var statusIcon = '⏳',
                             cls = '';
                         if (m.status === 'win') { statusIcon = '✅';
                             cls = 'win'; } else if (m.status === 'loss') { statusIcon = '❌';
                             cls = 'loss'; }
-                        const isWaiting = m.status === 'waiting';
-                        return `<div class="history-item ${cls}">
-                                <div class="info">
-                                    <div class="title">${m.home} — ${m.away}</div>
-                                    <div class="sub">ОЗ ${m.oz}% · Кэф ${m.odds} · ${m.date} ${m.time}</div>
-                                    ${m.league && m.league !== 'Не указана' ? `<div class="sub">🏆 ${m.league} · ${m.country}</div>` : ''}
-                                    ${m.comment ? `<div class="sub">📝 ${m.comment}</div>` : ''}
-                                    ${m.score ? `<div class="sub">⚽ Счёт: ${m.score}</div>` : ''}
-                                </div>
-                                <div class="status">${statusIcon}</div>
-                                <div class="actions">
-                                    ${isWaiting ? `<button class="btn btn-sm btn-primary" data-id="${m.id}">📝 Счёт</button>` : ''}
-                                    <button class="btn btn-sm btn-secondary" data-edit="${m.id}">✏️</button>
-                                    <button class="btn btn-sm btn-danger" data-del="${m.id}">🗑️</button>
-                                    <button class="btn btn-sm btn-secondary" data-duplicate="${m.id}">📋</button>
-                                </div>
-                            </div>`;
+                        var isWaiting = m.status === 'waiting';
+                        return '<div class="history-item ' + cls + '">' +
+                            '<div class="info">' +
+                            '<div class="title">' + m.home + ' — ' + m.away + '</div>' +
+                            '<div class="sub">ОЗ ' + m.oz + '% · Кэф ' + m.odds + ' · ' + m.date + ' ' + m
+                            .time + '</div>' +
+                            (m.league && m.league !== 'Не указана' ? '<div class="sub">🏆 ' + m.league +
+                                ' · ' + m.country + '</div>' : '') +
+                            (m.comment ? '<div class="sub">📝 ' + m.comment + '</div>' : '') +
+                            (m.score ? '<div class="sub">⚽ Счёт: ' + m.score + '</div>' : '') +
+                            '</div>' +
+                            '<div class="status">' + statusIcon + '</div>' +
+                            '<div class="actions">' +
+                            (isWaiting ? '<button class="btn btn-sm btn-primary" data-id="' + m.id +
+                                '">📝 Счёт</button>' : '') +
+                            '<button class="btn btn-sm btn-secondary" data-edit="' + m.id + '">✏️</button>' +
+                            '<button class="btn btn-sm btn-danger" data-del="' + m.id + '">🗑️</button>' +
+                            '<button class="btn btn-sm btn-secondary" data-duplicate="' + m.id +
+                            '">📋</button>' +
+                            '</div></div>';
                     }).join('');
                 }
 
                 document.querySelectorAll('[data-id]').forEach(function(btn) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const id = parseInt(this.dataset.id);
+                        var id = parseInt(this.dataset.id);
                         enterScore(id);
                     });
                 });
                 document.querySelectorAll('[data-edit]').forEach(function(btn) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const id = parseInt(this.dataset.edit);
+                        var id = parseInt(this.dataset.edit);
                         editMatch(id);
                     });
                 });
                 document.querySelectorAll('[data-del]').forEach(function(btn) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const id = parseInt(this.dataset.del);
+                        var id = parseInt(this.dataset.del);
                         if (confirm('Удалить матч?')) {
                             appData.matches = appData.matches.filter(function(m) { return m.id !== id; });
                             saveData();
@@ -1165,7 +1388,7 @@
                 document.querySelectorAll('[data-duplicate]').forEach(function(btn) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const id = parseInt(this.dataset.duplicate);
+                        var id = parseInt(this.dataset.duplicate);
                         duplicateMatch(id);
                     });
                 });
@@ -1178,14 +1401,14 @@
             // ВВОД СЧЁТА
             // ============================================================
             function enterScore(id) {
-                const match = appData.matches.find(function(m) { return m.id === id; });
+                var match = appData.matches.find(function(m) { return m.id === id; });
                 if (!match) return;
-                const score = prompt('Введите счёт (например: 2:1):', match.score || '0:0');
+                var score = prompt('Введите счёт (например: 2:1):', match.score || '0:0');
                 if (score !== null && score.trim() !== '') {
                     match.score = score.trim();
-                    const parts = score.split(':').map(Number);
-                    const homeGoals = parts[0] || 0;
-                    const awayGoals = parts[1] || 0;
+                    var parts = score.split(':').map(Number);
+                    var homeGoals = parts[0] || 0;
+                    var awayGoals = parts[1] || 0;
                     match.status = (homeGoals > 0 && awayGoals > 0) ? 'win' : 'loss';
                     saveData();
                     renderHistory();
@@ -1197,15 +1420,15 @@
             // РЕДАКТИРОВАНИЕ
             // ============================================================
             function editMatch(id) {
-                const match = appData.matches.find(function(m) { return m.id === id; });
+                var match = appData.matches.find(function(m) { return m.id === id; });
                 if (!match) return;
-                const newHome = prompt('Хозяева:', match.home);
+                var newHome = prompt('Хозяева:', match.home);
                 if (newHome !== null && newHome.trim() !== '') match.home = newHome.trim();
-                const newAway = prompt('Гости:', match.away);
+                var newAway = prompt('Гости:', match.away);
                 if (newAway !== null && newAway.trim() !== '') match.away = newAway.trim();
-                const newOz = prompt('ОЗ %:', match.oz);
+                var newOz = prompt('ОЗ %:', match.oz);
                 if (newOz !== null && !isNaN(parseFloat(newOz))) match.oz = parseFloat(newOz);
-                const newOdds = prompt('Кэф:', match.odds);
+                var newOdds = prompt('Кэф:', match.odds);
                 if (newOdds !== null && !isNaN(parseFloat(newOdds))) match.odds = parseFloat(newOdds);
                 saveData();
                 renderHistory();
@@ -1216,9 +1439,9 @@
             // ДУБЛИРОВАНИЕ
             // ============================================================
             function duplicateMatch(id) {
-                const original = appData.matches.find(function(m) { return m.id === id; });
+                var original = appData.matches.find(function(m) { return m.id === id; });
                 if (!original) return;
-                const copy = JSON.parse(JSON.stringify(original));
+                var copy = JSON.parse(JSON.stringify(original));
                 copy.id = Date.now();
                 copy.status = 'waiting';
                 copy.score = '';
@@ -1234,10 +1457,10 @@
             // СТАТИСТИКА
             // ============================================================
             function updateStats() {
-                const total = appData.matches.length;
-                const wins = appData.matches.filter(function(m) { return m.status === 'win'; }).length;
-                const losses = appData.matches.filter(function(m) { return m.status === 'loss'; }).length;
-                const pct = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
+                var total = appData.matches.length;
+                var wins = appData.matches.filter(function(m) { return m.status === 'win'; }).length;
+                var losses = appData.matches.filter(function(m) { return m.status === 'loss'; }).length;
+                var pct = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
 
                 document.getElementById('totalCount').textContent = total;
                 document.getElementById('winCount').textContent = wins;
@@ -1249,44 +1472,47 @@
             // СТАТИСТИКА ПО ДНЯМ
             // ============================================================
             function renderDayStats() {
-                const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-                const stats = {};
+                var days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+                var stats = {};
                 days.forEach(function(d) { stats[d] = { total: 0, wins: 0 }; });
 
                 appData.matches.forEach(function(m) {
                     if (m.status === 'waiting') return;
-                    const date = new Date(m.date);
-                    const dayName = days[date.getDay() === 0 ? 6 : date.getDay() - 1];
+                    var date = new Date(m.date);
+                    var dayName = days[date.getDay() === 0 ? 6 : date.getDay() - 1];
                     if (stats[dayName]) {
                         stats[dayName].total++;
                         if (m.status === 'win') stats[dayName].wins++;
                     }
                 });
 
-                const grid = document.getElementById('dayStatsGrid');
+                var grid = document.getElementById('dayStatsGrid');
                 grid.innerHTML = days.map(function(d) {
-                    const s = stats[d];
-                    const pct = s.total > 0 ? Math.round((s.wins / s.total) * 100) : 0;
-                    return `<div><div style="font-weight:600;">${d}</div><div style="font-size:16px; color:${pct >= 70 ? '#00E676' : pct >= 50 ? '#FFD740' : '#FF5253'};">${pct}%</div><div style="font-size:10px; color:#9E9E9E;">${s.total} матчей</div></div>`;
+                    var s = stats[d];
+                    var pct = s.total > 0 ? Math.round((s.wins / s.total) * 100) : 0;
+                    return '<div><div style="font-weight:600;">' + d + '</div>' +
+                        '<div style="font-size:16px; color:' + (pct >= 70 ? '#00E676' : pct >= 50 ? '#FFD740' :
+                            '#FF5253') + ';">' + pct + '%</div>' +
+                        '<div style="font-size:10px; color:#9E9E9E;">' + s.total + ' матчей</div></div>';
                 }).join('');
             }
 
             // ============================================================
-            // ЭКСПОРТ / ИМПОРТ
+            // ЭКСПОРТ / ИМПОРТ / СБРОС
             // ============================================================
             function exportData() {
-                const data = {
-                    version: '4.2 PRO',
+                var data = {
+                    version: '5.0 PRO',
                     exportDate: new Date().toISOString(),
                     matches: appData.matches || [],
                     settings: appData.settings || defaultSettings,
                     trainingHistory: appData.trainingHistory || [],
                     apiKey: appData.apiKey ? '****' : ''
                 };
-                const json = JSON.stringify(data, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
+                var json = JSON.stringify(data, null, 2);
+                var blob = new Blob([json], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
                 a.href = url;
                 a.download = 'quantum_backup_' + new Date().toISOString().slice(0, 10) + '.json';
                 a.click();
@@ -1294,15 +1520,15 @@
             }
 
             function importData(file) {
-                const reader = new FileReader();
+                var reader = new FileReader();
                 reader.onload = function(e) {
                     try {
-                        const data = JSON.parse(e.target.result);
+                        var data = JSON.parse(e.target.result);
                         if (data.matches && Array.isArray(data.matches)) {
-                            const validMatches = data.matches.filter(function(m) { return m.home && m.away; });
+                            var validMatches = data.matches.filter(function(m) { return m.home && m.away; });
                             if (validMatches.length > 0) {
-                                const existingIds = new Set(appData.matches.map(function(m) { return m.id; }));
-                                let added = 0;
+                                var existingIds = new Set(appData.matches.map(function(m) { return m.id; }));
+                                var added = 0;
                                 validMatches.forEach(function(m) {
                                     if (!existingIds.has(m.id)) {
                                         appData.matches.push(m);
@@ -1330,13 +1556,11 @@
                 reader.readAsText(file);
             }
 
-            // ============================================================
-            // СБРОС
-            // ============================================================
             function resetAll() {
                 if (confirm('Удалить все данные?')) {
                     appData = { matches: [], settings: JSON.parse(JSON.stringify(defaultSettings)), trainingHistory: [],
                         apiKey: '' };
+                    apiKey = '';
                     document.getElementById('apiKeyInput').value = '';
                     document.getElementById('apiStatus').textContent = '';
                     saveData();
@@ -1352,24 +1576,23 @@
             // ОБУЧЕНИЕ (заглушка)
             // ============================================================
             function runTraining() {
-                const matches = appData.matches || [];
-                const wins = matches.filter(function(m) { return m.status === 'win'; }).length;
-                const losses = matches.filter(function(m) { return m.status === 'loss'; }).length;
-                const total = wins + losses;
-                const pct = total > 0 ? Math.round((wins / total) * 100) : 0;
+                var matches = appData.matches || [];
+                var wins = matches.filter(function(m) { return m.status === 'win'; }).length;
+                var losses = matches.filter(function(m) { return m.status === 'loss'; }).length;
+                var total = wins + losses;
+                var pct = total > 0 ? Math.round((wins / total) * 100) : 0;
                 if (total < 3) { alert('Нужно минимум 3 завершённых матча.'); return; }
-                const history = appData.trainingHistory || [];
+                var history = appData.trainingHistory || [];
                 history.push({ date: new Date().toLocaleDateString(), matches: total, acc: pct, loss: (1 - pct / 100)
                         .toFixed(2) });
                 appData.trainingHistory = history;
                 saveData();
-                const histDiv = document.getElementById('trainingHistory');
+                var histDiv = document.getElementById('trainingHistory');
                 histDiv.innerHTML = history.map(function(h, i) {
-                    return `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1F2633;">
-                            <span>#${i+1} (${h.matches} матчей)</span>
-                            <span style="color:#00E676;">${h.acc}%</span>
-                            <span style="color:#9E9E9E;">loss ${h.loss}</span>
-                        </div>`;
+                    return '<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1F2633;">' +
+                        '<span>#' + (i + 1) + ' (' + h.matches + ' матчей)</span>' +
+                        '<span style="color:#00E676;">' + h.acc + '%</span>' +
+                        '<span style="color:#9E9E9E;">loss ' + h.loss + '</span></div>';
                 }).join('');
                 document.getElementById('modelMatches').textContent = total;
                 document.getElementById('modelAcc').textContent = pct + '%';
@@ -1387,12 +1610,15 @@
                 loadSettingsToUI();
                 applyTheme();
 
+                // Автопоиск
+                setupTeamSearch();
+
                 // Ввод
-                const inputs = ['inputHome', 'inputAway', 'inputLeague', 'inputCountry', 'inputXg', 'inputXga', 'inputOz',
+                var inputs = ['inputHome', 'inputAway', 'inputLeague', 'inputCountry', 'inputXg', 'inputXga', 'inputOz',
                     'inputOdds', 'inputComment'
                 ];
                 inputs.forEach(function(id) {
-                    const el = document.getElementById(id);
+                    var el = document.getElementById(id);
                     if (el) el.addEventListener('input', updateMainCard);
                 });
 
@@ -1417,20 +1643,20 @@
 
                 // Настройки — слайдеры
                 document.getElementById('settingTrust').addEventListener('input', function() {
-                    const val = parseInt(this.value);
+                    var val = parseInt(this.value);
                     document.getElementById('settingTrustVal').textContent = val + '%';
                     appData.settings.trust = val;
                     saveData();
                     updateMainCard();
                 });
                 document.getElementById('settingOz').addEventListener('input', function() {
-                    const val = parseInt(this.value);
+                    var val = parseInt(this.value);
                     document.getElementById('settingOzVal').textContent = val + '%';
                     appData.settings.minOz = val;
                     saveData();
                 });
                 document.getElementById('settingKelly').addEventListener('input', function() {
-                    const val = parseInt(this.value);
+                    var val = parseInt(this.value);
                     document.getElementById('settingKellyVal').textContent = val + '%';
                     appData.settings.kellyPercent = val;
                     saveData();
@@ -1439,7 +1665,7 @@
 
                 // Настройки — тогглы
                 function setupToggle(id, key) {
-                    const el = document.getElementById(id);
+                    var el = document.getElementById(id);
                     if (!el) return;
                     el.addEventListener('click', function() {
                         this.classList.toggle('active');
@@ -1461,11 +1687,13 @@
 
                 // API — только сохранение
                 document.getElementById('saveApiKeyBtn').addEventListener('click', function() {
-                    const key = document.getElementById('apiKeyInput').value.trim();
+                    var key = document.getElementById('apiKeyInput').value.trim();
                     if (key) {
+                        apiKey = key;
                         appData.apiKey = key;
                         saveData();
                         document.getElementById('apiStatus').textContent = '✅ Ключ сохранён';
+                        setupTeamSearch();
                     } else {
                         document.getElementById('apiStatus').textContent = '❌ Введите ключ';
                     }
@@ -1502,12 +1730,12 @@
                 // Обучение
                 document.getElementById('trainBtn').addEventListener('click', runTraining);
                 document.getElementById('copyStatsBtn').addEventListener('click', function() {
-                    const matches = appData.matches || [];
-                    const total = matches.length;
-                    const wins = matches.filter(function(m) { return m.status === 'win'; }).length;
-                    const losses = matches.filter(function(m) { return m.status === 'loss'; }).length;
-                    const pct = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
-                    const report = '🔥 КВАНТУМ PRO v4.2\n\nВсего матчей: ' + total + '\nЗашло: ' + wins +
+                    var matches = appData.matches || [];
+                    var total = matches.length;
+                    var wins = matches.filter(function(m) { return m.status === 'win'; }).length;
+                    var losses = matches.filter(function(m) { return m.status === 'loss'; }).length;
+                    var pct = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
+                    var report = '🔥 КВАНТУМ PRO v5.0\n\nВсего матчей: ' + total + '\nЗашло: ' + wins +
                         '\nНе зашло: ' + losses + '\nПроцент побед: ' + pct + '%';
                     navigator.clipboard.writeText(report).then(function() {
                         alert('✅ Статистика скопирована!');
@@ -1533,7 +1761,7 @@
                 }
                 renderHistory();
                 updateMainCard();
-                console.log('✅ Слой 4 загружен, матчей:', appData.matches.length);
+                console.log('✅ v5.0 Слой 1 загружен, матчей:', appData.matches.length);
             });
         })();
     </script>
