@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Квантум PRO v4.2 — Слой 3</title>
+    <title>Квантум PRO v4.2 — Слой 4</title>
     <style>
         * {
             margin: 0;
@@ -15,6 +15,110 @@
             background: #0B0E17;
             color: #E0E0E0;
             padding-bottom: 70px;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.light {
+            background: #F2F2F7;
+            color: #1C1C1E;
+        }
+        body.light .header,
+        body.light .nav-bar {
+            background: #FFFFFF;
+            border-bottom-color: #E5E5EA;
+            border-top-color: #E5E5EA;
+        }
+        body.light .card,
+        body.light .history-item,
+        body.light .summary,
+        body.light .training-status,
+        body.light .quick-input,
+        body.light .setting-group {
+            background: #FFFFFF;
+            border-color: #E5E5EA;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        body.light .header h1 span {
+            background: #007AFF;
+            color: #FFFFFF;
+        }
+        body.light .nav-item.active {
+            color: #007AFF;
+        }
+        body.light .btn-primary {
+            background: #007AFF;
+            color: #FFFFFF;
+        }
+        body.light .btn-primary:active {
+            background: #0055CC;
+        }
+        body.light .btn-secondary {
+            background: #E5E5EA;
+            color: #1C1C1E;
+        }
+        body.light .btn-secondary:active {
+            background: #D1D1D6;
+        }
+        body.light .indicator .label .value {
+            color: #007AFF;
+        }
+        body.light .indicator .bar {
+            background: #E5E5EA;
+        }
+        body.light .indicator .bar .fill {
+            background: linear-gradient(90deg, #007AFF, #0055CC);
+        }
+        body.light .toggle {
+            background: #E5E5EA;
+        }
+        body.light .toggle.active {
+            background: #007AFF;
+        }
+        body.light .toggle::after {
+            background: #FFFFFF;
+        }
+        body.light .toggle.active::after {
+            background: #FFFFFF;
+        }
+        body.light .filter-bar .tag {
+            background: #E5E5EA;
+            color: #1C1C1E;
+        }
+        body.light .filter-bar .tag.active {
+            border-color: #007AFF;
+            color: #007AFF;
+            background: #F2F2F7;
+        }
+        body.light .history-item.win {
+            border-left-color: #007AFF;
+        }
+        body.light .summary .stat .num {
+            color: #007AFF;
+        }
+        body.light .training-status .badge {
+            background: #007AFF;
+            color: #FFFFFF;
+        }
+        body.light .ai-advice {
+            background: #F2F2F7;
+            border-left-color: #007AFF;
+        }
+        body.light .import-area {
+            border-color: #E5E5EA;
+        }
+        body.light .import-area.dragover {
+            border-color: #007AFF;
+            background: rgba(0, 122, 255, 0.05);
+        }
+        body.light .setting-row input[type="range"] {
+            accent-color: #007AFF;
+            background: #E5E5EA;
+        }
+        body.light .setting-row input[type="text"],
+        body.light .quick-input .row input,
+        body.light .quick-input .full-width {
+            background: #F2F2F7;
+            border-color: #E5E5EA;
+            color: #1C1C1E;
         }
         .header {
             background: #0B0E17;
@@ -317,6 +421,149 @@
             font-size: 12px;
             color: #9E9E9E;
         }
+        .setting-group {
+            background: #141A26;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .setting-group .title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #B0B0B0;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #1F2633;
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-row .label {
+            font-size: 14px;
+        }
+        .setting-row input[type="range"] {
+            width: 140px;
+            accent-color: #00E676;
+            background: #1F2633;
+            height: 4px;
+            border-radius: 8px;
+        }
+        .setting-row input[type="text"],
+        .setting-row input[type="password"] {
+            width: 200px;
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 1px solid #1F2633;
+            background: #0B0E17;
+            color: #E0E0E0;
+            font-size: 13px;
+            font-family: monospace;
+            outline: none;
+        }
+        .toggle {
+            width: 48px;
+            height: 28px;
+            background: #1F2633;
+            border-radius: 30px;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .toggle.active {
+            background: #00E676;
+        }
+        .toggle::after {
+            content: "";
+            width: 22px;
+            height: 22px;
+            background: #E0E0E0;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: 0.2s;
+        }
+        .toggle.active::after {
+            transform: translateX(20px);
+            background: #0B0E17;
+        }
+        .training-status {
+            background: #141A26;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .training-status .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+        .training-status .badge {
+            background: #00E676;
+            color: #0B0E17;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .ai-advice {
+            background: #1F2633;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            border-left: 4px solid #00E676;
+        }
+        .import-area {
+            border: 2px dashed #1F2633;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            color: #9E9E9E;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .import-area.dragover {
+            border-color: #00E676;
+            background: rgba(0, 230, 118, 0.05);
+        }
+        .import-area .icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .import-area .sub {
+            font-size: 12px;
+            color: #5A667A;
+        }
+        .day-stats {
+            background: #141A26;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        .day-stats .title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .day-stats .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 4px;
+            font-size: 11px;
+            text-align: center;
+        }
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -356,24 +603,6 @@
         }
         .nav-item:active {
             transform: scale(0.92);
-        }
-        .day-stats {
-            background: #141A26;
-            border-radius: 16px;
-            padding: 12px;
-            margin-top: 12px;
-        }
-        .day-stats .title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-        .day-stats .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-            gap: 4px;
-            font-size: 11px;
-            text-align: center;
         }
         .hidden {
             display: none !important;
@@ -473,19 +702,116 @@
             </div>
         </div>
 
-        <!-- ===== ОБУЧЕНИЕ ===== -->
-        <div class="screen" id="screen-training">
-            <div class="card">
-                <h2>🧠 Обучение</h2>
-                <p style="color:#9E9E9E;">Здесь будет обучение AI</p>
-            </div>
-        </div>
-
         <!-- ===== НАСТРОЙКИ ===== -->
         <div class="screen" id="screen-settings">
-            <div class="card">
-                <h2>⚙️ Настройки</h2>
-                <p style="color:#9E9E9E;">Здесь будут настройки</p>
+            <div class="setting-group">
+                <div class="title">🔍 Основные параметры</div>
+                <div class="setting-row">
+                    <span class="label">🎯 Индекс доверия</span>
+                    <input type="range" min="0" max="100" value="38" id="settingTrust">
+                    <span id="settingTrustVal">38%</span>
+                </div>
+                <div class="setting-row">
+                    <span class="label">🎯 Минимальная ОЗ</span>
+                    <input type="range" min="50" max="95" value="86" id="settingOz">
+                    <span id="settingOzVal">86%</span>
+                </div>
+                <div class="setting-row">
+                    <span class="label">📈 % ставки (Келли)</span>
+                    <input type="range" min="5" max="40" value="20" id="settingKelly">
+                    <span id="settingKellyVal">20%</span>
+                </div>
+                <div class="setting-row">
+                    <span class="label">Только ОЗ – ДА</span>
+                    <div class="toggle active" id="toggleOnlyOz"></div>
+                </div>
+                <div class="setting-row">
+                    <span class="label">Режим «Только валуй»</span>
+                    <div class="toggle" id="toggleOnlyValue"></div>
+                </div>
+                <div class="setting-row">
+                    <span class="label">🌓 Светлая тема</span>
+                    <div class="toggle" id="toggleTheme"></div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="title">🌐 API-FOOTBALL</div>
+                <div class="setting-row">
+                    <span class="label">🔑 API Ключ</span>
+                    <input type="password" id="apiKeyInput" placeholder="Вставьте ваш ключ">
+                </div>
+                <div class="setting-row">
+                    <span class="label"></span>
+                    <button class="btn btn-sm btn-primary" id="saveApiKeyBtn" style="min-width:100px;">💾 Сохранить</button>
+                    <button class="btn btn-sm btn-secondary" id="testApiKeyBtn" style="min-width:100px;">🔍 Тест</button>
+                </div>
+                <div id="apiStatus" style="font-size:12px; color:#9E9E9E; margin-top:4px; text-align:center;"></div>
+            </div>
+
+            <div class="setting-group">
+                <div class="title">💾 Управление данными</div>
+                <div class="import-area" id="importArea">
+                    <span class="icon">📂</span>
+                    <div>Нажмите или перетащите JSON-файл</div>
+                    <div class="sub">Поддерживается формат экспорта Квантум PRO</div>
+                    <input type="file" id="fileInput" accept=".json" style="display:none;">
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                    <button class="btn btn-sm btn-primary" id="exportDataBtn" style="flex:1;">💾 Сохранить данные</button>
+                    <button class="btn btn-sm btn-danger" id="resetAllBtn" style="flex:1;">🗑️ Сбросить всё</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="title">🔔 Уведомления</div>
+                <div class="setting-row">
+                    <span class="label">Звук при находке валуя</span>
+                    <div class="toggle active" id="toggleSound"></div>
+                </div>
+                <div class="setting-row">
+                    <span class="label">Виброотклик при заходе</span>
+                    <div class="toggle active" id="toggleVibration"></div>
+                </div>
+                <div class="setting-row">
+                    <span class="label">Напоминание о результате</span>
+                    <div class="toggle active" id="toggleReminder"></div>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%; margin-top:12px;" id="resetSettingsBtn">🔄 Сбросить к начальным</button>
+        </div>
+
+        <!-- ===== ОБУЧЕНИЕ ===== -->
+        <div class="screen" id="screen-training">
+            <div class="training-status">
+                <div class="row"><span>🟢 Статус</span><span class="badge" id="modelStatus">Обучена</span></div>
+                <div class="row"><span>📊 Матчей в базе</span><span id="modelMatches">0</span></div>
+                <div class="row"><span>🎯 Точность (acc)</span><span id="modelAcc">0%</span></div>
+                <div class="row"><span>📉 Ошибка (loss)</span><span id="modelLoss">0.00</span></div>
+            </div>
+            <div style="background:#141A26; border-radius:16px; padding:16px; margin-bottom:16px;">
+                <div style="font-weight:600; margin-bottom:8px;">📈 История обучения</div>
+                <div id="trainingHistory" style="font-size:14px; color:#9E9E9E;">Пока нет данных</div>
+            </div>
+            <div style="background:#141A26; border-radius:16px; padding:16px; margin-bottom:16px;">
+                <div style="font-weight:600; margin-bottom:8px;">🔍 Твой паттерн</div>
+                <div style="font-size:14px; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                    <span>🎯 Индекс 38% + ОЗ ≥ 86%</span>
+                    <span style="text-align:right;">📊 <span id="patternPercent">0%</span></span>
+                    <span>📈 ROI</span>
+                    <span style="text-align:right; color:#00E676;" id="patternRoi">0%</span>
+                    <span>✅ Статус</span>
+                    <span style="text-align:right; color:#FFD740;" id="patternStatus">⏳ Сбор данных...</span>
+                </div>
+            </div>
+            <div class="ai-advice" id="aiAdviceBlock">
+                <strong>🧠 Персональный совет AI</strong><br>
+                <span id="aiAdviceText">Соберите 10+ матчей для первых рекомендаций.</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn btn-primary" id="trainBtn">🧠 ЗАПУСТИТЬ ОБУЧЕНИЕ</button>
+                <button class="btn btn-secondary" id="copyStatsBtn">📋 СКОПИРОВАТЬ СТАТИСТИКУ</button>
+                <button class="btn btn-secondary" id="resetBtn" style="color:#FF5253;">🗑️ СБРОСИТЬ ВСЁ</button>
             </div>
         </div>
     </div>
@@ -510,10 +836,10 @@
         (function() {
             'use strict';
 
-            console.log('✅ Слой 3 (исправленный) — история + сохранение');
+            console.log('✅ Слой 4 — полные настройки');
 
             // ============================================================
-            // ДАННЫЕ (с проверкой)
+            // ДАННЫЕ
             // ============================================================
             let appData = loadData();
             let currentFilter = 'all';
@@ -523,31 +849,46 @@
                     const raw = localStorage.getItem('quantumData');
                     if (raw) {
                         const parsed = JSON.parse(raw);
-                        // Проверяем, что matches — это массив
-                        if (!parsed.matches || !Array.isArray(parsed.matches)) {
-                            parsed.matches = [];
-                        }
+                        if (!parsed.matches || !Array.isArray(parsed.matches)) parsed.matches = [];
+                        if (!parsed.settings) parsed.settings = {};
+                        if (!parsed.trainingHistory) parsed.trainingHistory = [];
+                        if (!parsed.apiKey) parsed.apiKey = '';
                         return parsed;
                     }
                 } catch (e) {
-                    console.warn('Ошибка загрузки данных, создаём новые');
+                    console.warn('Ошибка загрузки данных');
                 }
-                return { matches: [] };
+                return { matches: [], settings: {}, trainingHistory: [], apiKey: '' };
             }
 
             function saveData() {
                 localStorage.setItem('quantumData', JSON.stringify(appData));
-                console.log('💾 Данные сохранены, матчей:', appData.matches.length);
+                console.log('💾 Данные сохранены');
             }
 
             // ============================================================
-            // НАСТРОЙКИ
+            // НАСТРОЙКИ ПО УМОЛЧАНИЮ
             // ============================================================
-            const settings = {
+            const defaultSettings = {
                 trust: 38,
+                minOz: 86,
+                kellyPercent: 20,
                 bank: 10000,
-                kellyPercent: 20
+                onlyOz: true,
+                onlyValue: false,
+                sound: true,
+                vibration: true,
+                reminder: true,
+                theme: 'dark'
             };
+
+            function getSettings() {
+                const s = appData.settings;
+                for (let k in defaultSettings) {
+                    if (!(k in s)) s[k] = defaultSettings[k];
+                }
+                return s;
+            }
 
             // ============================================================
             // НАВИГАЦИЯ
@@ -571,15 +912,63 @@
                     if (screens[target]) {
                         screens[target].classList.add('active');
                         if (target === 'screen-history') renderHistory();
+                        if (target === 'screen-settings') loadSettingsToUI();
                     }
                     console.log('🔀 Переключено на:', target);
                 });
             });
 
             // ============================================================
+            // ТЕМА
+            // ============================================================
+            function applyTheme() {
+                const settings = getSettings();
+                const isLight = settings.theme === 'light';
+                document.body.classList.toggle('light', isLight);
+                const toggle = document.getElementById('toggleTheme');
+                if (toggle) toggle.classList.toggle('active', isLight);
+            }
+
+            // ============================================================
+            // НАСТРОЙКИ UI
+            // ============================================================
+            function loadSettingsToUI() {
+                const s = getSettings();
+                document.getElementById('settingTrust').value = s.trust;
+                document.getElementById('settingTrustVal').textContent = s.trust + '%';
+                document.getElementById('settingOz').value = s.minOz;
+                document.getElementById('settingOzVal').textContent = s.minOz + '%';
+                document.getElementById('settingKelly').value = s.kellyPercent;
+                document.getElementById('settingKellyVal').textContent = s.kellyPercent + '%';
+                setToggle('toggleOnlyOz', s.onlyOz);
+                setToggle('toggleOnlyValue', s.onlyValue);
+                setToggle('toggleSound', s.sound);
+                setToggle('toggleVibration', s.vibration);
+                setToggle('toggleReminder', s.reminder);
+                setToggle('toggleTheme', s.theme === 'light');
+                if (appData.apiKey) {
+                    document.getElementById('apiKeyInput').value = appData.apiKey;
+                    document.getElementById('apiStatus').textContent = '✅ Ключ загружен';
+                }
+            }
+
+            function setToggle(id, state) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (state) el.classList.add('active');
+                else el.classList.remove('active');
+            }
+
+            function getToggle(id) {
+                const el = document.getElementById(id);
+                return el ? el.classList.contains('active') : false;
+            }
+
+            // ============================================================
             // КАРТОЧКА МАТЧА
             // ============================================================
             function updateMainCard() {
+                const settings = getSettings();
                 const home = document.getElementById('inputHome').value || '—';
                 const away = document.getElementById('inputAway').value || '—';
                 const oz = parseFloat(document.getElementById('inputOz').value) || 0;
@@ -651,7 +1040,7 @@
             }
 
             // ============================================================
-            // СОХРАНЕНИЕ МАТЧА (исправленное)
+            // СОХРАНЕНИЕ МАТЧА
             // ============================================================
             function saveMatch() {
                 const home = document.getElementById('inputHome').value.trim() || '—';
@@ -663,6 +1052,7 @@
                 const xg = parseFloat(document.getElementById('inputXg').value) || 0;
                 const xga = parseFloat(document.getElementById('inputXga').value) || 0;
                 const comment = document.getElementById('inputComment').value.trim() || '';
+                const settings = getSettings();
 
                 if (home === '—' || away === '—' || oz === 0 || odds === 0) {
                     alert('⚠️ Заполните все обязательные поля (Хозяева, Гости, ОЗ, Кэф)');
@@ -687,20 +1077,15 @@
                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 };
 
-                // Добавляем матч в начало массива
                 appData.matches.unshift(match);
                 saveData();
 
-                // Анимация
                 const card = document.getElementById('matchCard');
                 card.classList.add('fly-away');
                 setTimeout(function() {
                     card.classList.remove('fly-away');
-                    // Очищаем поля, но не сбрасываем карточку полностью
                     clearFields();
-                    // Обновляем историю
                     renderHistory();
-                    // Обновляем карточку
                     updateMainCard();
                     alert('✅ Матч сохранён!');
                 }, 400);
@@ -753,7 +1138,6 @@
                     }).join('');
                 }
 
-                // Обработчики
                 document.querySelectorAll('[data-id]').forEach(function(btn) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
@@ -889,17 +1273,161 @@
             }
 
             // ============================================================
+            // API
+            // ============================================================
+            const API_BASE = 'https://api-football-v1.p.rapidapi.com/v3';
+
+            function testApiKey() {
+                const key = document.getElementById('apiKeyInput').value.trim();
+                if (!key) {
+                    document.getElementById('apiStatus').textContent = '❌ Введите ключ';
+                    return;
+                }
+                document.getElementById('apiStatus').textContent = '⏳ Проверка...';
+                fetch(`${API_BASE}/status`, {
+                    headers: {
+                        'x-rapidapi-key': key,
+                        'x-rapidapi-host': 'api-football-v1.p.rapidapi.com'
+                    }
+                }).then(function(response) {
+                    if (response.ok) {
+                        document.getElementById('apiStatus').textContent = '✅ Ключ работает!';
+                        appData.apiKey = key;
+                        saveData();
+                    } else {
+                        document.getElementById('apiStatus').textContent = '❌ Ключ не работает (' + response.status + ')';
+                    }
+                }).catch(function() {
+                    document.getElementById('apiStatus').textContent = '❌ Ошибка соединения';
+                });
+            }
+
+            // ============================================================
+            // ЭКСПОРТ / ИМПОРТ
+            // ============================================================
+            function exportData() {
+                const data = {
+                    version: '4.2 PRO',
+                    exportDate: new Date().toISOString(),
+                    matches: appData.matches || [],
+                    settings: appData.settings || defaultSettings,
+                    trainingHistory: appData.trainingHistory || [],
+                    apiKey: appData.apiKey ? '****' : ''
+                };
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'quantum_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            function importData(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (data.matches && Array.isArray(data.matches)) {
+                            const validMatches = data.matches.filter(function(m) { return m.home && m.away; });
+                            if (validMatches.length > 0) {
+                                const existingIds = new Set(appData.matches.map(function(m) { return m.id; }));
+                                let added = 0;
+                                validMatches.forEach(function(m) {
+                                    if (!existingIds.has(m.id)) {
+                                        appData.matches.push(m);
+                                        existingIds.add(m.id);
+                                        added++;
+                                    }
+                                });
+                                if (added > 0) {
+                                    saveData();
+                                    renderHistory();
+                                    alert('✅ Импортировано ' + added + ' матчей');
+                                } else {
+                                    alert('ℹ️ Новых матчей не найдено');
+                                }
+                            } else {
+                                alert('❌ Не найдено валидных матчей');
+                            }
+                        } else {
+                            alert('❌ Неверный формат файла');
+                        }
+                    } catch (err) {
+                        alert('❌ Ошибка при чтении файла: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // ============================================================
+            // СБРОС
+            // ============================================================
+            function resetAll() {
+                if (confirm('Удалить все данные?')) {
+                    appData = { matches: [], settings: JSON.parse(JSON.stringify(defaultSettings)), trainingHistory: [],
+                        apiKey: '' };
+                    document.getElementById('apiKeyInput').value = '';
+                    document.getElementById('apiStatus').textContent = '';
+                    saveData();
+                    renderHistory();
+                    loadSettingsToUI();
+                    applyTheme();
+                    updateMainCard();
+                    alert('✅ Все данные сброшены');
+                }
+            }
+
+            // ============================================================
+            // ОБУЧЕНИЕ (заглушка)
+            // ============================================================
+            function runTraining() {
+                const matches = appData.matches || [];
+                const wins = matches.filter(function(m) { return m.status === 'win'; }).length;
+                const losses = matches.filter(function(m) { return m.status === 'loss'; }).length;
+                const total = wins + losses;
+                const pct = total > 0 ? Math.round((wins / total) * 100) : 0;
+                if (total < 3) { alert('Нужно минимум 3 завершённых матча.'); return; }
+                const history = appData.trainingHistory || [];
+                history.push({ date: new Date().toLocaleDateString(), matches: total, acc: pct, loss: (1 - pct / 100)
+                        .toFixed(2) });
+                appData.trainingHistory = history;
+                saveData();
+                const histDiv = document.getElementById('trainingHistory');
+                histDiv.innerHTML = history.map(function(h, i) {
+                    return `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #1F2633;">
+                            <span>#${i+1} (${h.matches} матчей)</span>
+                            <span style="color:#00E676;">${h.acc}%</span>
+                            <span style="color:#9E9E9E;">loss ${h.loss}</span>
+                        </div>`;
+                }).join('');
+                document.getElementById('modelMatches').textContent = total;
+                document.getElementById('modelAcc').textContent = pct + '%';
+                document.getElementById('modelLoss').textContent = (1 - pct / 100).toFixed(2);
+                alert('✅ Обучение завершено! Точность: ' + pct + '%');
+            }
+
+            // ============================================================
             // СОБЫТИЯ
             // ============================================================
             document.addEventListener('DOMContentLoaded', function() {
                 console.log('🔄 DOM загружен');
 
-                const inputs = ['inputHome', 'inputAway', 'inputLeague', 'inputCountry', 'inputXg', 'inputXga', 'inputOz', 'inputOdds', 'inputComment'];
+                // Настройки
+                loadSettingsToUI();
+                applyTheme();
+
+                // Ввод
+                const inputs = ['inputHome', 'inputAway', 'inputLeague', 'inputCountry', 'inputXg', 'inputXga', 'inputOz',
+                    'inputOdds', 'inputComment'
+                ];
                 inputs.forEach(function(id) {
                     const el = document.getElementById(id);
                     if (el) el.addEventListener('input', updateMainCard);
                 });
 
+                // Кнопки главной
                 document.getElementById('clearFieldsBtn').addEventListener('click', clearFields);
                 document.getElementById('saveBtn').addEventListener('click', saveMatch);
                 document.getElementById('quickAddBtn').addEventListener('click', saveMatch);
@@ -918,13 +1446,126 @@
                     });
                 });
 
-                // Загружаем сохранённые матчи
+                // Настройки — слайдеры
+                document.getElementById('settingTrust').addEventListener('input', function() {
+                    const val = parseInt(this.value);
+                    document.getElementById('settingTrustVal').textContent = val + '%';
+                    appData.settings.trust = val;
+                    saveData();
+                    updateMainCard();
+                });
+                document.getElementById('settingOz').addEventListener('input', function() {
+                    const val = parseInt(this.value);
+                    document.getElementById('settingOzVal').textContent = val + '%';
+                    appData.settings.minOz = val;
+                    saveData();
+                });
+                document.getElementById('settingKelly').addEventListener('input', function() {
+                    const val = parseInt(this.value);
+                    document.getElementById('settingKellyVal').textContent = val + '%';
+                    appData.settings.kellyPercent = val;
+                    saveData();
+                    updateMainCard();
+                });
+
+                // Настройки — тогглы
+                function setupToggle(id, key) {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                        if (key === 'theme') {
+                            appData.settings.theme = this.classList.contains('active') ? 'light' : 'dark';
+                            applyTheme();
+                        } else {
+                            appData.settings[key] = this.classList.contains('active');
+                        }
+                        saveData();
+                    });
+                }
+                setupToggle('toggleOnlyOz', 'onlyOz');
+                setupToggle('toggleOnlyValue', 'onlyValue');
+                setupToggle('toggleSound', 'sound');
+                setupToggle('toggleVibration', 'vibration');
+                setupToggle('toggleReminder', 'reminder');
+                setupToggle('toggleTheme', 'theme');
+
+                // API
+                document.getElementById('saveApiKeyBtn').addEventListener('click', function() {
+                    const key = document.getElementById('apiKeyInput').value.trim();
+                    if (key) {
+                        appData.apiKey = key;
+                        saveData();
+                        document.getElementById('apiStatus').textContent = '✅ Ключ сохранён';
+                    } else {
+                        document.getElementById('apiStatus').textContent = '❌ Введите ключ';
+                    }
+                });
+                document.getElementById('testApiKeyBtn').addEventListener('click', testApiKey);
+
+                // Импорт / экспорт
+                document.getElementById('importArea').addEventListener('click', function() {
+                    document.getElementById('fileInput').click();
+                });
+                document.getElementById('importArea').addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                document.getElementById('importArea').addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+                document.getElementById('importArea').addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    if (e.dataTransfer.files.length > 0) {
+                        importData(e.dataTransfer.files[0]);
+                    }
+                });
+                document.getElementById('fileInput').addEventListener('change', function() {
+                    if (this.files.length > 0) {
+                        importData(this.files[0]);
+                        this.value = '';
+                    }
+                });
+                document.getElementById('exportDataBtn').addEventListener('click', exportData);
+                document.getElementById('resetAllBtn').addEventListener('click', resetAll);
+
+                // Обучение
+                document.getElementById('trainBtn').addEventListener('click', runTraining);
+                document.getElementById('copyStatsBtn').addEventListener('click', function() {
+                    const matches = appData.matches || [];
+                    const total = matches.length;
+                    const wins = matches.filter(function(m) { return m.status === 'win'; }).length;
+                    const losses = matches.filter(function(m) { return m.status === 'loss'; }).length;
+                    const pct = (wins + losses) > 0 ? Math.round((wins / (wins + losses)) * 100) : 0;
+                    const report = '🔥 КВАНТУМ PRO v4.2\n\nВсего матчей: ' + total + '\nЗашло: ' + wins +
+                        '\nНе зашло: ' + losses + '\nПроцент побед: ' + pct + '%';
+                    navigator.clipboard.writeText(report).then(function() {
+                        alert('✅ Статистика скопирована!');
+                    }).catch(function() {
+                        alert('❌ Не удалось скопировать');
+                    });
+                });
+                document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+                // Сброс настроек
+                document.getElementById('resetSettingsBtn').addEventListener('click', function() {
+                    appData.settings = JSON.parse(JSON.stringify(defaultSettings));
+                    saveData();
+                    loadSettingsToUI();
+                    applyTheme();
+                    updateMainCard();
+                    alert('✅ Настройки сброшены');
+                });
+
+                // Загрузка данных
                 if (!appData.matches || !Array.isArray(appData.matches)) {
                     appData.matches = [];
                 }
                 renderHistory();
                 updateMainCard();
-                console.log('✅ Слой 3 загружен, матчей:', appData.matches.length);
+                console.log('✅ Слой 4 загружен, матчей:', appData.matches.length);
             });
         })();
     </script>
