@@ -156,7 +156,7 @@
             </div>
         </div>
 
-        <!-- НАСТРОЙКИ -->
+        <!-- НАСТРОЙКИ (теперь 4-й таб) -->
         <div class="screen" id="screen-settings">
             <div class="card">
                 <h2>⚙️ Настройки</h2>
@@ -164,7 +164,7 @@
             </div>
         </div>
 
-        <!-- ОБУЧЕНИЕ -->
+        <!-- ОБУЧЕНИЕ (теперь 3-й таб) -->
         <div class="screen" id="screen-training">
             <div class="card">
                 <h2>🧠 Обучение</h2>
@@ -173,7 +173,7 @@
         </div>
     </div>
 
-    <!-- НАВИГАЦИЯ -->
+    <!-- НАВИГАЦИЯ (новый порядок: Главная, История, Обучение, Настройки) -->
     <div class="nav-bar" id="navBar">
         <button class="nav-item active" data-tab="screen-home">
             <span class="icon">🏠</span>Главная
@@ -181,11 +181,11 @@
         <button class="nav-item" data-tab="screen-history">
             <span class="icon">📋</span>История
         </button>
-        <button class="nav-item" data-tab="screen-settings">
-            <span class="icon">⚙️</span>Настройки
-        </button>
         <button class="nav-item" data-tab="screen-training">
             <span class="icon">🧠</span>Обучение
+        </button>
+        <button class="nav-item" data-tab="screen-settings">
+            <span class="icon">⚙️</span>Настройки
         </button>
     </div>
 
@@ -202,28 +202,24 @@
             const screens = {
                 'screen-home': document.getElementById('screen-home'),
                 'screen-history': document.getElementById('screen-history'),
-                'screen-settings': document.getElementById('screen-settings'),
-                'screen-training': document.getElementById('screen-training')
+                'screen-training': document.getElementById('screen-training'),
+                'screen-settings': document.getElementById('screen-settings')
             };
 
             navItems.forEach(function(item) {
                 item.addEventListener('click', function() {
                     const target = this.dataset.tab;
 
-                    // Убираем активный класс у всех кнопок
                     navItems.forEach(function(i) {
                         i.classList.remove('active');
                     });
 
-                    // Добавляем активный класс текущей кнопке
                     this.classList.add('active');
 
-                    // Скрываем все экраны
                     Object.keys(screens).forEach(function(key) {
                         screens[key].classList.remove('active');
                     });
 
-                    // Показываем нужный экран
                     if (screens[target]) {
                         screens[target].classList.add('active');
                     }
@@ -232,7 +228,7 @@
                 });
             });
 
-            console.log('✅ Навигация настроена');
+            console.log('✅ Навигация настроена (порядок: Главная, История, Обучение, Настройки)');
         })();
     </script>
 </body>
