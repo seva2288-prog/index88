@@ -1,5 +1,10 @@
 // Проверяем, что возвращает generateTestPredictions()
-generateTestPredictions().then(data => {
-    console.log('ПЕРВЫЙ МАТЧ:', data[0]);
-    console.log('ВСЕГО МАТЧЕЙ:', data.length);
+generateTestPredictions().then(data => { 
+    // Вместо console.log пишем данные прямо на страницу
+    document.body.innerHTML = '<h3>РЕЗУЛЬТАТЫ ПРОВЕРКИ:</h3>' +
+                              '<p>ПЕРВЫЙ МАТЧ: ' + JSON.stringify(data[0]) + '</p>' +
+                              '<p>ВСЕГО МАТЧЕЙ: ' + data.length + '</p>';
+}).catch(error => {
+    // Если произошла ошибка, выведем её на экран
+    document.body.innerHTML = '<h3 style="color:red;">ОШИБКА:</h3><p>' + error + '</p>';
 });
